@@ -170,3 +170,14 @@ export function isPropertyKey(val: unknown): val is PropertyKey {
 export function isValidDate(date: Date) {
   return date.toString() !== 'Invalid Date'
 }
+
+/**
+ * Determines whether the provided user agent string belongs to a mobile device.
+ *
+ * @param ua - The user agent string to check.
+ * @returns Returns true if the UA indicates a mobile device, otherwise false.
+ */
+export function isMobile(ua?: string): boolean {
+  if (!ua) return false
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Windows Phone|Kindle|Silk|Opera Mini|Mobile/i.test(ua)
+}

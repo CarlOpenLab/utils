@@ -13,7 +13,8 @@ import {
   isPromise,
   isValidArray,
   isValidDate,
-  isPropertyKey
+  isPropertyKey,
+  isMobile
 } from '../../lib'
 
 describe('hasOwnProperty', () => {
@@ -279,5 +280,47 @@ describe('isPropertyKey function', () => {
 
   test('should return false for undefined', () => {
     expect(isPropertyKey(undefined)).toBe(false)
+  })
+})
+
+describe('isMobile', () => {
+  test('should return true for iPhone UA', () => {
+    expect(
+      isMobile(
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1'
+      )
+    ).toBe(true)
+  })
+
+  test('should return true for Android UA', () => {
+    expect(
+      isMobile(
+        'Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0 Mobile Safari/537.36'
+      )
+    ).toBe(true)
+  })
+
+  test('should return true for Windows Phone UA', () => {
+    expect(
+      isMobile(
+        'Mozilla/5.0 (Windows Phone 10.0; Android 6.0.1; Microsoft; RM-1116) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0 Mobile Safari/537.36 Edge/15.15254'
+      )
+    ).toBe(true)
+  })
+
+  test('should return false for desktop Chrome UA', () => {
+    expect(
+      isMobile(
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0 Safari/537.36'
+      )
+    ).toBe(false)
+  })
+
+  test('should return false for empty UA', () => {
+    expect(isMobile('')).toBe(false)
+  })
+
+  test('should return false when UA is undefined', () => {
+    expect(isMobile()).toBe(false)
   })
 })

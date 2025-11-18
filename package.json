@@ -20,16 +20,20 @@
     "gulp:deploy": "gulp deploy",
     "gulp:publish": "gulp publish",
     "prettier": "npx prettier --write .",
-    "eslint": "npx eslint --fix .",
+    "lint": "npx eslint --fix .",
     "doc": "node --loader ts-node/esm ./scripts/generator-type-doc.ts",
     "cz": "npx commitizen",
     "changelog": "conventional-changelog -p gitmoji-config -i CHANGELOG_PRE.md -s -r 5.0.0"
   },
   "typesVersions": {
-		"*": {
-			"*": ["./dist", "./dist/types", "./*"]
-		}
-	},
+    "*": {
+      "*": [
+        "./dist",
+        "./dist/types",
+        "./*"
+      ]
+    }
+  },
   "exports": {
     ".": [
       {
@@ -51,6 +55,7 @@
     "@types/jest": "^29.5.12",
     "@types/node": "^18.19.44",
     "@typescript-eslint/eslint-plugin": "^8.1.0",
+    "@typescript-eslint/typescript-estree": "^8.47.0",
     "commitizen": "^4.3.0",
     "conventional-changelog-cli": "^5.0.0",
     "conventional-changelog-gitmoji-config": "^1.5.2",
