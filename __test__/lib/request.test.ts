@@ -12,7 +12,7 @@ describe('Request', () => {
   })
 
   // ──────────────────────────────────────────────
-  // 基础功能
+  // Basic features
   // ──────────────────────────────────────────────
 
   test('should append GET params to query string', async () => {
@@ -188,7 +188,7 @@ describe('Request', () => {
   })
 
   // ──────────────────────────────────────────────
-  // 生命周期回调
+  // Lifecycle callbacks
   // ──────────────────────────────────────────────
 
   test('should call onSuccess with response data', async () => {
@@ -629,7 +629,7 @@ describe('Request', () => {
   }, 10000)
 
   // ──────────────────────────────────────────────
-  // thenable: await / Promise.all 支持
+  // thenable: await / Promise.all support
   // ──────────────────────────────────────────────
 
   test('should be directly awaitable without .promise', async () => {
@@ -666,7 +666,7 @@ describe('Request', () => {
   })
 })
 
-// ─── 测试辅助函数 ──────────────────────────────
+// ─── Test helpers ──────────────────────────────
 
 function jsonResponse(data: unknown): Response {
   return {
