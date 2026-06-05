@@ -1,7 +1,7 @@
 import { objectToQueryString } from './url'
 import { MIME_TYPES } from './const/http'
 
-// ─── Thenable handle (可 await 的返回结果) ───
+// ─── Thenable handle ───
 
 export interface RequestHandle<T> {
   then: <R1 = T, R2 = never>(
@@ -15,7 +15,7 @@ export interface RequestHandle<T> {
   abort: () => void
 }
 
-// ─── 拦截器类型 ───
+// ─── Interceptor types ───
 
 export type RequestInterceptor = (
   config: RequestInit
@@ -27,14 +27,14 @@ export type ResponseInterceptor<T = unknown, U = unknown> = (
 
 export type ErrorInterceptor = (error: unknown) => unknown | Promise<unknown>
 
-// ─── 缓存配置 ───
+// ─── Cache config ───
 
 export interface CacheConfig {
   /** Time-to-live in milliseconds. */
   ttl: number
 }
 
-// ─── 请求配置 ───
+// ─── Request config ───
 
 export interface RequestConfig extends RequestInit {
   params?: Record<PropertyKey, any>
@@ -53,7 +53,7 @@ export interface RequestConfig extends RequestInit {
   /** Download progress callback. Receives (loadedBytes, totalBytes). */
   onDownloadProgress?: (loaded: number, total: number) => void
 
-  // ─── 生命周期回调 ───
+  // ─── Lifecycle callbacks ───
   onSuccess?: (data: unknown) => void
   onError?: (error: unknown) => void
   onAbort?: () => void
@@ -147,7 +147,7 @@ export class Request {
     return () => this.removeInterceptor(this.errorInterceptors, interceptor)
   }
 
-  // ─── 快捷方法 ───
+  // ─── Convenience methods ───
 
   get<T = unknown>(
     url: string,
@@ -182,7 +182,7 @@ export class Request {
     this.cacheMap.clear()
   }
 
-  // ─── 核心：request ───
+  // ─── Core: request ───
 
   request<T = unknown>(
     url: string,
@@ -191,7 +191,7 @@ export class Request {
     const controller = new AbortController()
     const promise = this.execute<T>(url, config, controller)
 
-    // onAbort 在 abort() 时直接触发
+    // onAbort fires directly when abort() is called
     const handle = {
       then: (onfulfilled?: any, onrejected?: any) =>
         (promise as Promise<T>).then(onfulfilled, onrejected),
@@ -207,7 +207,7 @@ export class Request {
     return handle
   }
 
-  // ─── 内部：execute ───
+  // ─── Internal: execute ───
 
   private buildCacheKey(method: string, url: string): string {
     return `${method}:${url}`
@@ -229,7 +229,7 @@ export class Request {
       retryDelay = 0,
       cache,
       onDownloadProgress,
-      // 剥离回调，不下传到 RequestInit
+      // Strip lifecycle callbacks — don't pass them down to RequestInit
       onSuccess,
       onError,
       onAbort: _onAbort,
@@ -259,7 +259,7 @@ export class Request {
         onFinally?.()
         return dedupData as T
       } catch {
-        // 上游失败了，fall through 重新发起
+        // Upstream failed, fall through to retry
       }
     }
 
@@ -308,7 +308,7 @@ export class Request {
     }
   }
 
-  // ─── 内部：executeWithRetry ───
+  // ─── Internal: executeWithRetry ───
 
   private async executeWithRetry<T>(
     requestUrl: string,
@@ -404,7 +404,7 @@ export class Request {
           continue
         }
 
-        // 最后一次尝试：执行 errorInterceptors 后 throw
+        // Last attempt: run errorInterceptors then throw
         const processedError = await this.runErrorInterceptors(error, [
           ...this.errorInterceptors,
           ...errorInterceptors
@@ -420,7 +420,7 @@ export class Request {
     throw new Error('Unreachable')
   }
 
-  // ─── 进度读取 ───
+  // ─── Progress reader ───
 
   private async readResponseWithProgress(
     response: Response,
@@ -458,7 +458,7 @@ export class Request {
     return new Blob([allChunks.buffer], { type: contentType || undefined })
   }
 
-  // ─── 构建请求 ───
+  // ─── Build request ───
 
   private buildRequestInit(
     method: string,
@@ -542,7 +542,7 @@ export class Request {
     return Object.fromEntries(entries)
   }
 
-  // ─── 拦截器管道 ───
+  // ─── Interceptor pipeline ───
 
   private async runRequestInterceptors(
     config: RequestInit,
@@ -577,7 +577,7 @@ export class Request {
     return currentError
   }
 
-  // ─── 响应解析 ───
+  // ─── Response parsing ───
 
   private async parseResponse(response: Response) {
     const contentType = response.headers.get('content-type') ?? ''
