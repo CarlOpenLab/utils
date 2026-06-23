@@ -4,14 +4,21 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'README_ZH.md'
+      - 'CHANGELOG.md'
+      - 'LICENSE'
+      - '.github/**'
 
-  pull_request:
-    branches:
-      - main
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout code
@@ -40,8 +47,8 @@ jobs:
           branch: docs
           folder: docs
           token: ${{ secrets.GITHUB_TOKEN }}
-          repository-name: cc-heart-dev/utils
           target-folder: ./
           single-commit: true
           dotfiles: true
           clean: true
+          commit-message: 'docs: update documentation [skip ci]'
