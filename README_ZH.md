@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/CarlOpenLab/utils/main/assets/logo.png" width="160" alt="@cc-heart/utils logo" />
+  <img src="https://raw.githubusercontent.com/CarlOpenLab/utils/main/assets/logo.png?v=2" width="160" alt="@cc-heart/utils logo" />
 </p>
 
 <h1 align="center">@cc-heart/utils</h1>
