@@ -44,10 +44,11 @@ export function executeQueue(
         return
       }
       const fn = taskQueue[index++]
-      fn &&
+      if (fn) {
         Promise.resolve(fn?.()).finally(() => {
           loopFunc()
         })
+      }
     }
     loopFunc()
   })

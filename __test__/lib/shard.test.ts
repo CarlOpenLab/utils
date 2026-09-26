@@ -1,17 +1,22 @@
+import { rs } from '@rstest/core'
 import { noop, sleep } from '../../lib/shard'
 
 describe('noop function', () => {
-  expect(noop()).toBeUndefined()
+  it('should return undefined', () => {
+    expect(noop()).toBeUndefined()
+  })
 })
 
 describe('sleep function', () => {
   it('should be called only once when ', async () => {
-    const fn = jest.fn()
+    rs.useFakeTimers()
+    const fn = rs.fn()
     const act = sleep(500)
     act.then(fn)
     expect(fn).not.toBeCalled()
-    jest.runAllTimers()
+    rs.runAllTimers()
     await act
     expect(fn).toBeCalled()
+    rs.useRealTimers()
   })
 })

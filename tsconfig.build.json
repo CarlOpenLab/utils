@@ -29,8 +29,13 @@
   "exclude": [
     "__test__/**/*",
     "node_modules/**/*",
-    "rollup.config.js",
+    "dist/**/*",
     "types/**/*",
-    "example/**/*"
+    "example/**/*",
+    "rslib.config.ts",
+    "rstest.config.ts",
+    "rslint.config.ts",
+    "rspress.config.ts",
+    "docs/**/*"
   ]
 }

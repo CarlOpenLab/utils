@@ -1,3 +1,4 @@
+import { rs } from '@rstest/core'
 import {
   unCapitalize,
   capitalize,
@@ -39,7 +40,7 @@ describe('underlineToHump', () => {
 
 describe('mulSplit function', () => {
   beforeAll(() => {
-    jest.useFakeTimers()
+    rs.useFakeTimers()
   })
   it('should return a new array', () => {
     expect(mulSplit('a,b,c', ',')).toEqual(['a', 'b', 'c'])

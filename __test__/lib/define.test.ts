@@ -1,3 +1,4 @@
+import { rs } from '@rstest/core'
 import {
   defineDebounceFn,
   defineOnceFn,
@@ -7,41 +8,41 @@ import {
 
 describe('defineDebounceFn', () => {
   beforeAll(() => {
-    jest.useFakeTimers()
+    rs.useFakeTimers()
   })
 
   it('should be called only once when ', () => {
-    const fn = jest.fn()
+    const fn = rs.fn()
     const debounce = defineDebounceFn(fn)
     debounce()
     debounce()
     debounce()
-    jest.runAllTimers()
+    rs.runAllTimers()
     expect(fn.mock.calls.length).toBe(1)
     expect(fn).toHaveBeenCalledTimes(1)
   })
 
   it('should be called every when execution is delayed', async () => {
-    const fn = jest.fn()
+    const fn = rs.fn()
     const debounce = defineDebounceFn(fn, 500)
     debounce()
-    jest.runAllTimers()
+    rs.runAllTimers()
     debounce()
-    jest.runAllTimers()
+    rs.runAllTimers()
     debounce()
-    jest.runAllTimers()
+    rs.runAllTimers()
     expect(fn.mock.calls.length).toBe(3)
     expect(fn).toHaveBeenCalledTimes(3)
   })
 
   it('should be called immediately when set immediate', async () => {
-    const fn = jest.fn()
+    const fn = rs.fn()
     const debounce = defineDebounceFn(fn, 500, true)
     debounce()
     debounce()
     debounce()
     expect(fn).toHaveBeenCalled()
-    jest.advanceTimersByTime(500)
+    rs.advanceTimersByTime(500)
     expect(fn.mock.calls.length).toBe(2)
   })
 })
@@ -59,7 +60,7 @@ describe('defineOnceFn module', () => {
   })
 
   it('It should only be executed once when it is called multiple times', () => {
-    const mockFn = jest.fn((num1: number, num2: number) => num1 + num2)
+    const mockFn = rs.fn((num1: number, num2: number) => num1 + num2)
     const fn = defineOnceFn(() => mockFn(1, 2))
     for (let i = 0; i < 3; i++) {
       fn()
@@ -70,11 +71,11 @@ describe('defineOnceFn module', () => {
 
 describe('defineThrottleFn', () => {
   beforeAll(() => {
-    jest.useFakeTimers()
+    rs.useFakeTimers()
   })
 
   it('should call the function immediately if the delay is 0', async () => {
-    const fn = jest.fn()
+    const fn = rs.fn()
 
     const delay = 0
     const throttledFn = defineThrottleFn(fn, delay)
@@ -84,7 +85,7 @@ describe('defineThrottleFn', () => {
 
   it('should call the function immediately if the delay is negative', async () => {
     const delay = -100
-    const fn = jest.fn()
+    const fn = rs.fn()
 
     const throttledFn = defineThrottleFn(fn, delay)
     throttledFn()
@@ -93,7 +94,7 @@ describe('defineThrottleFn', () => {
 
   it('if the execution time is less than the delay, it will be executed at the delay time', async () => {
     const delay = 100
-    const fn = jest.fn()
+    const fn = rs.fn()
 
     const throttledFn = defineThrottleFn(fn, delay)
     throttledFn()
@@ -101,16 +102,16 @@ describe('defineThrottleFn', () => {
 
     expect(fn).toHaveBeenCalled()
     expect(fn).toHaveBeenCalledTimes(1)
-    jest.advanceTimersByTime(100)
+    rs.advanceTimersByTime(100)
     expect(fn).toHaveBeenCalledTimes(2)
   })
 
   test('should call the function again after the default delay', () => {
-    const fn = jest.fn()
+    const fn = rs.fn()
     const throttledFn = defineThrottleFn(fn)
 
     throttledFn()
-    jest.advanceTimersByTime(500)
+    rs.advanceTimersByTime(500)
     throttledFn()
 
     expect(fn).toHaveBeenCalledTimes(2)
@@ -119,16 +120,16 @@ describe('defineThrottleFn', () => {
 
 describe('defineSinglePromiseFn', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
+    rs.useFakeTimers()
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
-    jest.useRealTimers()
+    rs.restoreAllMocks()
+    rs.useRealTimers()
   })
 
   it('should call the callback function only once', async () => {
-    const mockFn = jest.fn(async () => {
+    const mockFn = rs.fn(async () => {
       await new Promise((resolve) => setTimeout(resolve, 100))
       return 'result'
     })
@@ -140,7 +141,7 @@ describe('defineSinglePromiseFn', () => {
 
     expect(mockFn).toHaveBeenCalledTimes(1)
 
-    await jest.advanceTimersByTimeAsync(100)
+    await rs.advanceTimersByTimeAsync(100)
 
     const result1 = await p1
     const result2 = await p2
@@ -149,7 +150,7 @@ describe('defineSinglePromiseFn', () => {
     expect(result2).toBe('result')
   })
   it('should allow new calls after the Promise resolves', async () => {
-    const mockFn = jest.fn(async () => {
+    const mockFn = rs.fn(async () => {
       await new Promise((resolve) => setTimeout(resolve, 50))
       return 'new result'
     })
@@ -157,11 +158,11 @@ describe('defineSinglePromiseFn', () => {
     const singletonFn = defineSinglePromiseFn(mockFn)
 
     let ret = singletonFn()
-    await jest.advanceTimersByTimeAsync(50)
+    await rs.advanceTimersByTimeAsync(50)
     await ret
 
     ret = singletonFn()
-    await jest.advanceTimersByTimeAsync(50)
+    await rs.advanceTimersByTimeAsync(50)
 
     await ret
 
@@ -169,7 +170,7 @@ describe('defineSinglePromiseFn', () => {
   })
 
   it('should correctly handle a rejected Promise', async () => {
-    const mockFn = jest.fn(async () => {
+    const mockFn = rs.fn(async () => {
       await new Promise((_, reject) =>
         setTimeout(() => reject(new Error('error occurred')), 50)
       )
@@ -180,11 +181,11 @@ describe('defineSinglePromiseFn', () => {
     const p1 = singletonFn()
     expect(p1).rejects.toThrow('error occurred')
 
-    await jest.advanceTimersByTimeAsync(50)
+    await rs.advanceTimersByTimeAsync(50)
 
     const p2 = singletonFn()
     const ret = expect(p2).rejects.toThrow('error occurred')
-    await jest.advanceTimersByTimeAsync(50)
+    await rs.advanceTimersByTimeAsync(50)
     await ret
     expect(mockFn).toHaveBeenCalledTimes(2)
   })

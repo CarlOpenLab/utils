@@ -1,3 +1,4 @@
+import { rs } from '@rstest/core'
 import {
   getCurrentTimeISOString,
   formatDateByTimeStamp,
@@ -136,13 +137,13 @@ describe('formatDate', () => {
 
 describe('formatDateByTimeStamp', () => {
   beforeEach(() => {
-    jest.spyOn(console, 'warn').mockImplementation(() => {
+    rs.spyOn(console, 'warn').mockImplementation(() => {
       /** */
     })
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    rs.restoreAllMocks()
   })
 
   test('should return date.toString() when timeStamp is less than 0', () => {
@@ -168,13 +169,13 @@ describe('formatDateByTimeStamp', () => {
 
 describe('formatDateTimeByString', () => {
   beforeEach(() => {
-    jest.spyOn(console, 'warn').mockImplementation(() => {
+    rs.spyOn(console, 'warn').mockImplementation(() => {
       /** */
     })
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    rs.restoreAllMocks()
   })
 
   test('should return date string when input is valid date', () => {
@@ -217,13 +218,13 @@ describe('formatDateTimeByString', () => {
 
 describe('formatDateByArray', () => {
   beforeEach(() => {
-    jest.spyOn(console, 'warn').mockImplementation(() => {
+    rs.spyOn(console, 'warn').mockImplementation(() => {
       /** */
     })
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    rs.restoreAllMocks()
   })
 
   test('should return Invalid Date when array is not an array or length is less than 2', () => {
@@ -246,7 +247,7 @@ describe('formatDateByArray', () => {
     const invalidDateArray = [2024, NaN, 1]
     const result = formatDateByArray(invalidDateArray)
     expect(result).toEqual('Invalid Date')
-    const consoleWarnSpy = jest.spyOn(console, 'warn')
+    const consoleWarnSpy = rs.spyOn(console, 'warn')
     expect(consoleWarnSpy).toHaveBeenCalledWith(
       `Invalid date generated from array: 2024,NaN,1`
     )

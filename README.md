@@ -33,6 +33,101 @@ import { capitalize } from '@cc-heart/utils'
 capitalize('string') // String
 ```
 
+## Async — retry, timeout, waitFor
+
+Three small primitives for async control flow. They are composable on purpose: **the nesting order expresses the semantics**, instead of one giant options bag.
+
+```ts
+import { retry, withTimeout, waitFor, TimeoutError } from '@cc-heart/utils'
+```
+
+### Which one do I need?
+
+| Situation | Function |
+| --- | --- |
+| The operation **throws** and is worth running again | `retry` |
+| The operation did not fail — the result is just **not ready yet** (e.g. a DOM element) | `waitFor` |
+| Any operation should **give up after N ms** | `withTimeout` |
+
+### `retry(fn, options?)`
+
+Re-runs an async operation until it succeeds or the retry budget is exhausted. Rethrows the **last** error when all attempts fail.
+
+```ts
+const user = await retry(() => fetchUser(id), { retries: 3 })
+
+// Only retry server errors, log every attempt
+const data = await retry(() => api.post(payload), {
+  retries: 5,
+  backoff: 'exponential',
+  shouldRetry: (err) => err instanceof HttpError && err.status >= 500,
+  onRetry: (err, attempt, nextDelay) =>
+    console.warn(`attempt ${attempt} failed, retrying in ${nextDelay}ms`)
+})
+```
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `retries` | `number` | `3` | Retries after the first attempt fails |
+| `delay` | `number` | `1000` | Base delay between attempts (ms) |
+| `backoff` | `'fixed' \| 'linear' \| 'exponential'` | `'exponential'` | Delay growth per attempt |
+| `maxDelay` | `number` | `30000` | Upper bound for the computed delay (ms) |
+| `jitter` | `boolean` | `true` | Randomize delay (50%–100%) to avoid thundering herd |
+| `shouldRetry` | `(error, attempt) => boolean` | — | Return `false` to rethrow immediately (e.g. 4xx) |
+| `onRetry` | `(error, attempt, nextDelay) => void` | — | Called before each retry, good for logging |
+| `signal` | `AbortSignal` | — | Cancels waiting between attempts |
+
+### `withTimeout(promise, ms, options?)`
+
+Races a promise against a time budget; rejects with a `TimeoutError` when exceeded.
+
+```ts
+const data = await withTimeout(fetch('/api/slow'), 5000)
+```
+
+Note: rejection does not cancel the underlying work — pass an `AbortSignal` to the operation itself if it supports cancellation.
+
+### `waitFor(predicate, options?)`
+
+Polls a predicate (sync or async) until it returns a truthy value, then resolves with it. Ideal for DOM scripting: "the element hasn't rendered yet" is not an error, it's a condition.
+
+```ts
+const modal = await waitFor(
+  () => document.querySelector<HTMLElement>('.modal'),
+  { timeout: 10_000 }
+)
+```
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `interval` | `number` | `100` | Interval between evaluations (ms) |
+| `timeout` | `number` | `10000` | Overall budget (ms); `Infinity` waits forever |
+| `signal` | `AbortSignal` | — | Cancels polling |
+
+### Composition
+
+```ts
+// Each attempt may take at most 5s, retry up to 3 times
+await retry(() => withTimeout(fetchData(), 5000), { retries: 3 })
+
+// Keep retrying, but cap the whole flow at 30s
+await withTimeout(retry(fetchData, { retries: 10 }), 30_000)
+
+// Wait for an element, click it with retries, all within 10s
+await withTimeout(
+  retry(
+    async () => {
+      const btn = await waitFor(() => document.querySelector('#submit'))
+      btn.click()
+    },
+    { retries: 3 }
+  ),
+  10_000
+)
+```
+
+Use `instanceof TimeoutError` to tell a timeout apart from an execution failure — e.g. inside `shouldRetry`.
+
 ## Request — composable best practices
 
 ```ts

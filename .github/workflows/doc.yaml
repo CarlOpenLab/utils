@@ -39,13 +39,13 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Build utils Docs
-        run: pnpm doc
+        run: pnpm docs:build
 
       - name: Deploy to docs branch
         uses: JamesIves/github-pages-deploy-action@v4.6.3
         with:
           branch: docs
-          folder: docs
+          folder: doc_build
           token: ${{ secrets.GITHUB_TOKEN }}
           target-folder: ./
           single-commit: true

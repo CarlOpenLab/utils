@@ -1,3 +1,4 @@
+import { rs } from '@rstest/core'
 import {
   executeConcurrency,
   executeQueue,
@@ -7,7 +8,7 @@ import {
   awaitTo
 } from '../../lib/workers'
 
-const warningFn = (console.warn = jest.fn())
+const warningFn = (console.warn = rs.fn())
 
 describe('executeConcurrency module', () => {
   it('should return a promise that resolves with an array of results', async () => {
@@ -35,11 +36,11 @@ describe('executeConcurrency module', () => {
   })
 
   it('should return a promise that resolves with an array of results when maxConcurrency is less than tasks.length', async () => {
-    jest.useFakeTimers()
+    rs.useFakeTimers()
     const _PromiseAll = Promise.all
-    Promise.all = jest.fn((tasks) => tasks) as any
+    Promise.all = rs.fn((tasks) => tasks) as any
     const status = Array.from({ length: 4 }).map(() => false)
-    const fn = jest.fn(
+    const fn = rs.fn(
       () =>
         new Promise((resolve) =>
           setTimeout(() => {
@@ -48,7 +49,7 @@ describe('executeConcurrency module', () => {
           }, 1000)
         )
     )
-    const fn1 = jest.fn(
+    const fn1 = rs.fn(
       () =>
         new Promise((resolve) =>
           setTimeout(() => {
@@ -57,7 +58,7 @@ describe('executeConcurrency module', () => {
           }, 1500)
         )
     )
-    const fn2 = jest.fn(
+    const fn2 = rs.fn(
       () =>
         new Promise((resolve) =>
           setTimeout(() => {
@@ -66,7 +67,7 @@ describe('executeConcurrency module', () => {
           }, 2000)
         )
     )
-    const fn3 = jest.fn(
+    const fn3 = rs.fn(
       () =>
         new Promise((resolve) =>
           setTimeout(() => {
@@ -108,9 +109,9 @@ describe('executeConcurrency module', () => {
 describe('invoke task queue', () => {
   test('should execute tasks in order', () => {
     const taskArray = [
-      jest.fn(() => Promise.resolve('Task 1')),
-      jest.fn(() => Promise.resolve('Task 2')),
-      jest.fn(() => Promise.resolve('Task 3'))
+      rs.fn(() => Promise.resolve('Task 1')),
+      rs.fn(() => Promise.resolve('Task 2')),
+      rs.fn(() => Promise.resolve('Task 3'))
     ]
 
     return executeQueue(taskArray).then(() => {
@@ -136,9 +137,9 @@ describe('invoke task queue', () => {
 
   test('should handle tasks that return promises', () => {
     const taskArray = [
-      jest.fn(() => Promise.resolve('Task 1')),
-      jest.fn(() => Promise.resolve('Task 2')),
-      jest.fn(() => Promise.resolve('Task 3'))
+      rs.fn(() => Promise.resolve('Task 1')),
+      rs.fn(() => Promise.resolve('Task 2')),
+      rs.fn(() => Promise.resolve('Task 3'))
     ]
 
     return executeQueue(taskArray).then(() => {
@@ -207,55 +208,55 @@ describe('compose', () => {
 
 describe('setintervalByTimeout', () => {
   test('setintervalByTimeout should call function at regular intervals', () => {
-    const fn = jest.fn()
+    const fn = rs.fn()
 
-    jest.useFakeTimers()
+    rs.useFakeTimers()
 
     // 设置间隔 1000ms 调用 fn
     const clearMyInterval = setintervalByTimeout(fn, 1000)
 
-    jest.advanceTimersByTime(1000)
+    rs.advanceTimersByTime(1000)
     expect(fn).toHaveBeenCalledTimes(1)
 
-    jest.advanceTimersByTime(2000)
+    rs.advanceTimersByTime(2000)
     expect(fn).toHaveBeenCalledTimes(3)
 
     // 清除定时器
     clearMyInterval()
 
     // 推进更多时间，fn 不应该再被调用
-    jest.advanceTimersByTime(3000)
+    rs.advanceTimersByTime(3000)
     expect(fn).toHaveBeenCalledTimes(3)
 
-    jest.useRealTimers()
+    rs.useRealTimers()
   })
 
   test('setintervalByTimeout should handle async functions correctly', async () => {
-    const fn = jest.fn().mockResolvedValueOnce(null) // 模拟异步函数
+    const fn = rs.fn().mockResolvedValueOnce(null) // 模拟异步函数
 
-    jest.useFakeTimers()
+    rs.useFakeTimers()
 
     const clearMyInterval = setintervalByTimeout(fn, 1000)
 
     // 推进 1000ms，fn 应该被调用一次
-    jest.advanceTimersByTime(1000)
+    rs.advanceTimersByTime(1000)
     await Promise.resolve() // 等待异步执行完成
     expect(fn).toHaveBeenCalledTimes(1)
 
     // 推进 2000ms，fn 应该被调用两次
-    jest.advanceTimersByTime(2000)
+    rs.advanceTimersByTime(2000)
     await Promise.resolve() // 等待异步执行完成
     expect(fn).toHaveBeenCalledTimes(3)
 
     clearMyInterval()
 
-    jest.useRealTimers()
+    rs.useRealTimers()
   })
 
   test('setintervalByTimeout should cancel next invoke when clearMyInterval is called', async () => {
-    jest.useFakeTimers()
+    rs.useFakeTimers()
 
-    const mockFn = jest.fn()
+    const mockFn = rs.fn()
     const fn = () => {
       return new Promise<void>((resolve) => {
         setTimeout(() => {
@@ -270,11 +271,11 @@ describe('setintervalByTimeout', () => {
     setTimeout(() => {
       clearMyInterval()
     }, 600)
-    await jest.advanceTimersByTimeAsync(2000)
+    await rs.advanceTimersByTimeAsync(2000)
     expect(mockFn).toHaveBeenCalledTimes(1)
-    await jest.advanceTimersByTimeAsync(2000)
+    await rs.advanceTimersByTimeAsync(2000)
     expect(mockFn).toHaveBeenCalledTimes(1)
-    jest.useRealTimers()
+    rs.useRealTimers()
   })
 })
 

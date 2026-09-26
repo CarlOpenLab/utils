@@ -33,6 +33,101 @@ import { capitalize } from '@cc-heart/utils'
 capitalize('string') // String
 ```
 
+## Async —— 重试、超时、等待
+
+三个小巧的异步控制原语。它们刻意保持可组合：**用语义化的嵌套顺序表达意图**，而不是把所有配置塞进一个函数。
+
+```ts
+import { retry, withTimeout, waitFor, TimeoutError } from '@cc-heart/utils'
+```
+
+### 该用哪一个？
+
+| 场景 | 函数 |
+| --- | --- |
+| 操作**抛错**了，值得再跑一次 | `retry` |
+| 操作没有失败，只是结果**还没准备好**（比如 DOM 元素还没渲染） | `waitFor` |
+| 任何操作想**限制在 N 毫秒内** | `withTimeout` |
+
+### `retry(fn, options?)`
+
+反复执行一个异步操作，直到成功或重试次数耗尽。全部失败时抛出**最后一次**的错误。
+
+```ts
+const user = await retry(() => fetchUser(id), { retries: 3 })
+
+// 只重试服务端错误，并记录每次重试
+const data = await retry(() => api.post(payload), {
+  retries: 5,
+  backoff: 'exponential',
+  shouldRetry: (err) => err instanceof HttpError && err.status >= 500,
+  onRetry: (err, attempt, nextDelay) =>
+    console.warn(`第 ${attempt} 次失败，${nextDelay}ms 后重试`)
+})
+```
+
+| 选项 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `retries` | `number` | `3` | 首次失败后的重试次数 |
+| `delay` | `number` | `1000` | 重试基础间隔（ms） |
+| `backoff` | `'fixed' \| 'linear' \| 'exponential'` | `'exponential'` | 间隔增长策略 |
+| `maxDelay` | `number` | `30000` | 计算出的间隔上限（ms） |
+| `jitter` | `boolean` | `true` | 间隔随机化（50%–100%），避免惊群 |
+| `shouldRetry` | `(error, attempt) => boolean` | — | 返回 `false` 立即抛出（如 4xx 错误） |
+| `onRetry` | `(error, attempt, nextDelay) => void` | — | 每次重试前触发，适合打日志 |
+| `signal` | `AbortSignal` | — | 取消重试间隔中的等待 |
+
+### `withTimeout(promise, ms, options?)`
+
+让 Promise 和时间预算赛跑，超时则以 `TimeoutError` 拒绝。
+
+```ts
+const data = await withTimeout(fetch('/api/slow'), 5000)
+```
+
+注意：超时拒绝并不会取消底层操作——如果操作本身支持取消，请把 `AbortSignal` 传给它。
+
+### `waitFor(predicate, options?)`
+
+轮询一个谓词（同步或异步），直到它返回 truthy 值并以该值兑现。特别适合 DOM 脚本："元素还没渲染出来"不是错误，只是一个尚未满足的条件。
+
+```ts
+const modal = await waitFor(
+  () => document.querySelector<HTMLElement>('.modal'),
+  { timeout: 10_000 }
+)
+```
+
+| 选项 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `interval` | `number` | `100` | 轮询间隔（ms） |
+| `timeout` | `number` | `10000` | 整体时间预算（ms）；传 `Infinity` 表示一直等 |
+| `signal` | `AbortSignal` | — | 取消轮询 |
+
+### 组合使用
+
+```ts
+// 每次尝试最多 5s，最多重试 3 次
+await retry(() => withTimeout(fetchData(), 5000), { retries: 3 })
+
+// 不断重试，但整个流程 30s 封顶
+await withTimeout(retry(fetchData, { retries: 10 }), 30_000)
+
+// 先等元素出现，再带重试地点击，全程 10s 预算
+await withTimeout(
+  retry(
+    async () => {
+      const btn = await waitFor(() => document.querySelector('#submit'))
+      btn.click()
+    },
+    { retries: 3 }
+  ),
+  10_000
+)
+```
+
+用 `instanceof TimeoutError` 区分"超时失败"和"执行失败"——比如在 `shouldRetry` 里。
+
 ## Request — 组合式最佳实践
 
 ```ts

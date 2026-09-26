@@ -28,7 +28,7 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Lint
-        run: pnpm eslint
+        run: pnpm lint
 
   test:
     runs-on: ${{ matrix.os }}

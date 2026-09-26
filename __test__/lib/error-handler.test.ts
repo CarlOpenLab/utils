@@ -1,17 +1,19 @@
+import { rs } from '@rstest/core'
+import type { Mock } from '@rstest/core'
 import { invokeWithErrorHandlingFactory, formatErrorToString } from '../../lib/error-handler'
 
 describe('invokeWithErrorHandlingFactory', () => {
-  let errorHandler: jest.Mock
+  let errorHandler: Mock
   let safeExecute: ReturnType<typeof invokeWithErrorHandlingFactory>
 
   beforeEach(() => {
-    errorHandler = jest.fn()
+    errorHandler = rs.fn()
     safeExecute = invokeWithErrorHandlingFactory(errorHandler)
   })
 
   describe('synchronous function execution', () => {
     it('should execute function successfully without errors', () => {
-      const mockFn = jest.fn(() => 'success')
+      const mockFn = rs.fn(() => 'success')
       const result = safeExecute(mockFn)
 
       expect(mockFn).toHaveBeenCalledTimes(1)
@@ -21,7 +23,7 @@ describe('invokeWithErrorHandlingFactory', () => {
 
     it('should handle synchronous errors', () => {
       const error = new Error('sync error')
-      const mockFn = jest.fn(() => { throw error })
+      const mockFn = rs.fn(() => { throw error })
 
       const result = safeExecute(mockFn)
 
@@ -32,7 +34,7 @@ describe('invokeWithErrorHandlingFactory', () => {
 
     it('should execute function with context and arguments', () => {
       const context = { value: 42 }
-      const mockFn = jest.fn(function(this: typeof context, a: number, b: number) {
+      const mockFn = rs.fn(function(this: typeof context, a: number, b: number) {
         return this.value + a + b
       })
 
@@ -46,7 +48,7 @@ describe('invokeWithErrorHandlingFactory', () => {
 
   describe('asynchronous function execution', () => {
     it('should execute async function successfully', async () => {
-      const mockFn = jest.fn(async () => 'async success')
+      const mockFn = rs.fn(async () => 'async success')
       const result = safeExecute(mockFn)
 
       expect(mockFn).toHaveBeenCalledTimes(1)
@@ -59,7 +61,7 @@ describe('invokeWithErrorHandlingFactory', () => {
 
     it('should handle async function rejections', async () => {
       const error = new Error('async error')
-      const mockFn = jest.fn(async () => { throw error })
+      const mockFn = rs.fn(async () => { throw error })
 
       const result = safeExecute(mockFn)
       expect(result).toBeInstanceOf(Promise)
@@ -72,7 +74,7 @@ describe('invokeWithErrorHandlingFactory', () => {
 
     it('should execute async function with context and arguments', async () => {
       const context = { multiplier: 3 }
-      const mockFn = jest.fn(async function(this: typeof context, value: number) {
+      const mockFn = rs.fn(async function(this: typeof context, value: number) {
         return this.multiplier * value
       })
 
@@ -89,7 +91,7 @@ describe('invokeWithErrorHandlingFactory', () => {
 
   describe('edge cases', () => {
     it('should handle function that returns null', () => {
-      const mockFn = jest.fn(() => null)
+      const mockFn = rs.fn(() => null)
       const result = safeExecute(mockFn)
 
       expect(result).toBeNull()
@@ -97,7 +99,7 @@ describe('invokeWithErrorHandlingFactory', () => {
     })
 
     it('should handle function that returns undefined', () => {
-      const mockFn = jest.fn(() => undefined)
+      const mockFn = rs.fn(() => undefined)
       const result = safeExecute(mockFn)
 
       expect(result).toBeUndefined()
@@ -105,7 +107,7 @@ describe('invokeWithErrorHandlingFactory', () => {
     })
 
     it('should execute function without context and arguments', () => {
-      const mockFn = jest.fn(() => 'no context')
+      const mockFn = rs.fn(() => 'no context')
       const result = safeExecute(mockFn)
 
       expect(mockFn).toHaveBeenCalledTimes(1)
@@ -114,7 +116,7 @@ describe('invokeWithErrorHandlingFactory', () => {
     })
 
     it('should handle empty arguments array', () => {
-      const mockFn = jest.fn(() => 'empty args')
+      const mockFn = rs.fn(() => 'empty args')
       const result = safeExecute(mockFn, undefined, [])
 
       expect(mockFn).toHaveBeenCalledWith()

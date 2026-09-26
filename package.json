@@ -14,16 +14,17 @@
     "dist"
   ],
   "scripts": {
-    "prebuild": "rimraf dist types",
-    "build": "npm run prebuild && rollup -c && tsc -p tsconfig.build.json && npm run doc",
-    "test": "cross-env TZ=Asia/Shanghai npx jest",
-    "gulp:deploy": "gulp deploy",
-    "gulp:publish": "gulp publish",
+    "build": "rm -rf dist types && rslib build && tsc -p tsconfig.build.json",
+    "test": "cross-env TZ=Asia/Shanghai rstest run",
     "prettier": "npx prettier --write .",
-    "lint": "npx eslint --fix .",
-    "doc": "node --loader ts-node/esm ./scripts/generator-type-doc.ts",
     "cz": "npx commitizen",
-    "changelog": "conventional-changelog -p gitmoji-config -i CHANGELOG_PRE.md -s -r 5.0.0"
+    "changelog": "conventional-changelog -p gitmoji-config -i CHANGELOG_PRE.md -s -r 5.0.0",
+    "test:watch": "cross-env TZ=Asia/Shanghai rstest",
+    "lint": "rslint .",
+    "lint:fix": "rslint . --fix",
+    "docs:dev": "rspress dev",
+    "docs:build": "rspress build",
+    "docs:preview": "rspress preview"
   },
   "typesVersions": {
     "*": {
@@ -47,33 +48,22 @@
     "./*": "./*"
   },
   "devDependencies": {
-    "@cc-heart/eslint-config": "^3.0.6",
-    "@rollup/plugin-commonjs": "^26.0.1",
-    "@rollup/plugin-node-resolve": "^15.2.3",
-    "@swc/core": "^1.7.11",
-    "@swc/jest": "^0.2.36",
-    "@types/jest": "^29.5.12",
+    "@rslib/core": "^1.0.2",
+    "@rslint/core": "^0.9.3",
+    "@rspress/core": "^2.0.22",
+    "@rspress/plugin-typedoc": "^2.0.22",
+    "@rstest/core": "^0.12.2",
     "@types/node": "^18.19.44",
-    "@typescript-eslint/eslint-plugin": "^8.1.0",
-    "@typescript-eslint/typescript-estree": "^8.47.0",
     "commitizen": "^4.3.0",
     "conventional-changelog-cli": "^5.0.0",
     "conventional-changelog-gitmoji-config": "^1.5.2",
     "cross-env": "^7.0.3",
     "cz-conventional-changelog": "^3.3.0",
-    "eslint": "^9.9.0",
-    "esm": "^3.2.25",
-    "gulp": "^5.0.0",
     "husky": "^9.1.4",
-    "jest": "^29.7.0",
     "prettier": "^3.3.3",
     "rimraf": "^6.0.1",
-    "rollup": "^4.20.0",
-    "rollup-plugin-typescript2": "^0.36.0",
     "standard-version": "^9.5.0",
-    "ts-node": "^10.9.2",
     "tslib": "^2.6.3",
-    "typedoc": "^0.25.13",
     "typescript": "^5.5.4"
   },
   "config": {
@@ -83,7 +73,7 @@
   },
   "lint-staged": {
     "*.{vue,js,ts,jsx,tsx,json}": [
-      "eslint --fix",
+      "rslint --fix",
       "prettier --write"
     ],
     "*.{md}": "prettier --write"

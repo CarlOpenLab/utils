@@ -6,7 +6,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "allowJs": false,
     "downlevelIteration": true,
     "importHelpers": true,
@@ -23,7 +23,8 @@
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
+    "types": ["node", "@rstest/core/globals"],
     "noEmit": true
   },
-  "exclude": ["node_modules/**/*", "types/**/*"]
+  "exclude": ["node_modules/**/*", "types/**/*", "docs/**/*", "doc_build/**/*", "dist/**/*"]
 }
