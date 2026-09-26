@@ -1,8 +1,23 @@
-# @cc-heart/utils
+<p align="center">
+  <img src="https://raw.githubusercontent.com/CarlOpenLab/utils/main/assets/logo.png" width="160" alt="@cc-heart/utils logo" />
+</p>
 
-[Docs](https://carlopenlab.github.io/utils/)
+<h1 align="center">@cc-heart/utils</h1>
 
-一个 JavaScript 工具库
+<p align="center">🔧 一个 JavaScript 通用工具库 —— 环境无关的核心层</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/@cc-heart/utils"><img src="https://img.shields.io/npm/v/@cc-heart/utils.svg" alt="npm version" /></a>
+  <a href="https://www.npmjs.com/package/@cc-heart/utils"><img src="https://img.shields.io/npm/dm/@cc-heart/utils.svg" alt="npm downloads" /></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/npm/l/@cc-heart/utils.svg" alt="license" /></a>
+</p>
+
+<p align="center">
+  <a href="https://carlopenlab.github.io/utils/">📖 文档</a> ·
+  <a href="./README.md">English</a>
+</p>
+
+> **utils 家族** · 核心：[`@cc-heart/utils`](https://github.com/CarlOpenLab/utils) · Node.js 运行时：[`@cc-heart/utils-service`](https://github.com/CarlOpenLab/utils-service) · 浏览器：[`@cc-heart/utils-client`](https://github.com/CarlOpenLab/utils-client)
 
 ## 安装
 

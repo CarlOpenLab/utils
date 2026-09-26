@@ -1,8 +1,23 @@
-# @cc-heart/utils
+<p align="center">
+  <img src="https://raw.githubusercontent.com/CarlOpenLab/utils/main/assets/logo.png" width="160" alt="@cc-heart/utils logo" />
+</p>
 
-[Docs](https://carlopenlab.github.io/utils/)
+<h1 align="center">@cc-heart/utils</h1>
 
-A library of JavaScript tools
+<p align="center">🔧 A library of JavaScript common tools — environment-agnostic core</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/@cc-heart/utils"><img src="https://img.shields.io/npm/v/@cc-heart/utils.svg" alt="npm version" /></a>
+  <a href="https://www.npmjs.com/package/@cc-heart/utils"><img src="https://img.shields.io/npm/dm/@cc-heart/utils.svg" alt="npm downloads" /></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/npm/l/@cc-heart/utils.svg" alt="license" /></a>
+</p>
+
+<p align="center">
+  <a href="https://carlopenlab.github.io/utils/">📖 Docs</a> ·
+  <a href="./README_ZH.md">中文文档</a>
+</p>
+
+> **The utils family** · core: [`@cc-heart/utils`](https://github.com/CarlOpenLab/utils) · Node.js runtime: [`@cc-heart/utils-service`](https://github.com/CarlOpenLab/utils-service) · browser: [`@cc-heart/utils-client`](https://github.com/CarlOpenLab/utils-client)
 
 ## Install
 
