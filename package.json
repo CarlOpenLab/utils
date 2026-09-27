@@ -51,6 +51,7 @@
     "@rslib/core": "^1.0.2",
     "@rslint/core": "^0.9.3",
     "@rspress/core": "^2.0.22",
+    "@rspress/plugin-playground": "^2.0.22",
     "@rspress/plugin-typedoc": "^2.0.22",
     "@rstest/core": "^0.12.2",
     "@types/node": "^18.19.44",

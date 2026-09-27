@@ -114,3 +114,44 @@ const data2 = await cachedApi.get('/users', {}, { cache: { ttl: 5000 } }) // cac
 
 const otherApi = new Request('/api') // isolated cache
 ```
+
+## Try it online
+
+A live `Request` demo against the public JSONPlaceholder API:
+
+```tsx playground
+import { useState } from 'react'
+import { Request } from '@cc-heart/utils'
+
+const api = new Request('https://jsonplaceholder.typicode.com')
+
+export default function App() {
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const load = async (id) => {
+    setLoading(true)
+    setError('')
+    try {
+      setUser(await api.get(`/users/${id}`))
+    } catch (e) {
+      setError(String(e))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div style={{ fontFamily: 'monospace' }}>
+      <button onClick={() => load(1)}>GET /users/1</button>{' '}
+      <button onClick={() => load(999)}>GET /users/999 (error)</button>
+      {loading && <p>loading...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {user && !loading && (
+        <pre>{JSON.stringify(user, null, 2)}</pre>
+      )}
+    </div>
+  )
+}
+```

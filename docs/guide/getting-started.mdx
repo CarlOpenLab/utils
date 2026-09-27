@@ -1,0 +1,60 @@
+# Getting Started
+
+`@cc-heart/utils` is a library of JavaScript common tools — the environment-agnostic core of the utils family.
+
+## Install
+
+```shell
+npm install @cc-heart/utils
+# or
+pnpm add @cc-heart/utils
+```
+
+## Usage
+
+```js
+import { capitalize } from '@cc-heart/utils'
+
+capitalize('string') // String
+```
+
+## What's inside
+
+- **string** — `capitalize`, `unCapitalize`, ...
+- **date** — date formatting helpers
+- **random** — random number / string generators
+- **validate** — type & value validators
+- **promise** — async helpers (`retry`, `withTimeout`, ...)
+- **request** — fetch-based HTTP client, see the [Request guide](/guide/request)
+- **sse** — Server-Sent Events, see the [SSE guide](/guide/sse)
+
+## Try it online
+
+Edit the code below and see results instantly — the demo runs against the published `@cc-heart/utils` package:
+
+```tsx playground
+import { useState } from 'react'
+import { capitalize, unCapitalize, underlineToHump, random } from '@cc-heart/utils'
+
+export default function App() {
+  const [text, setText] = useState('hello_world')
+  const [num, setNum] = useState(() => random(1, 100))
+
+  return (
+    <div style={{ fontFamily: 'monospace', lineHeight: 2 }}>
+      <input value={text} onChange={(e) => setText(e.target.value)} />
+      <div>capitalize: <b>{capitalize(text)}</b></div>
+      <div>unCapitalize: <b>{unCapitalize(text)}</b></div>
+      <div>underlineToHump: <b>{underlineToHump(text)}</b></div>
+      <div>
+        random(1, 100): <b>{num}</b>{' '}
+        <button onClick={() => setNum(random(1, 100))}>re-roll</button>
+      </div>
+    </div>
+  )
+}
+```
+
+## API Reference
+
+See the auto-generated [API documentation](/api/).
