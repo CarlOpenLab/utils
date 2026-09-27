@@ -1,0 +1,133 @@
+# Async
+
+Async flow control: retry, timeout, polling and sleeping.
+
+## retry
+
+Retry a (sync or async) function until it succeeds or retries are exhausted.
+
+```ts
+import { retry } from '@cc-heart/utils'
+
+const data = await retry(() => fetchData(), {
+  retries: 3,          // default: 3
+  delay: 1000,         // base delay in ms
+  backoff: 'exponential', // 'fixed' | 'linear' | 'exponential'
+  jitter: true,
+  onRetry: (err, attempt, delay) => console.warn(`attempt ${attempt} failed, next in ${delay}ms`),
+})
+```
+
+## withTimeout
+
+Race a promise against a time budget. Rejects with `TimeoutError` when the budget is exceeded (the underlying work is **not** cancelled — pass an `AbortSignal` for that).
+
+```ts
+import { withTimeout, TimeoutError } from '@cc-heart/utils'
+
+try {
+  await withTimeout(fetchData(), 3000)
+} catch (e) {
+  if (e instanceof TimeoutError) console.error('too slow')
+}
+```
+
+## waitFor
+
+Poll a predicate until it returns a truthy value, or time out.
+
+```ts
+import { waitFor } from '@cc-heart/utils'
+
+await waitFor(() => document.querySelector('#ready'), { interval: 100, timeout: 5000 })
+```
+
+## sleep
+
+Promise-based delay.
+
+```ts
+import { sleep } from '@cc-heart/utils'
+
+await sleep(1000) // wait 1s
+```
+
+## Demo
+
+`retry` against a flaky function that always fails twice before succeeding:
+
+```tsx playground
+import { useState } from 'react'
+import { retry } from '@cc-heart/utils'
+
+export default function App() {
+  const [log, setLog] = useState([])
+  const [running, setRunning] = useState(false)
+
+  const run = async () => {
+    setLog([])
+    setRunning(true)
+    let calls = 0
+    const flaky = () => {
+      calls++
+      if (calls <= 2) return Promise.reject(new Error(`fail #${calls}`))
+      return Promise.resolve(`ok after ${calls} calls`)
+    }
+    try {
+      const result = await retry(flaky, {
+        retries: 3,
+        delay: 300,
+        backoff: 'fixed',
+        jitter: false,
+        onRetry: (err, attempt, delay) =>
+          setLog((l) => [...l, `⚠️ ${err.message} → retry ${attempt} in ${delay}ms`]),
+      })
+      setLog((l) => [...l, `✅ ${result}`])
+    } catch (e) {
+      setLog((l) => [...l, `❌ ${e.message}`])
+    } finally {
+      setRunning(false)
+    }
+  }
+
+  return (
+    <div style={{ fontFamily: 'monospace' }}>
+      <button disabled={running} onClick={run}>
+        {running ? 'running...' : 'run retry()'}
+      </button>
+      {log.map((line, i) => (
+        <div key={i}>{line}</div>
+      ))}
+    </div>
+  )
+}
+```
+
+`withTimeout` racing a slow task against a 1s budget:
+
+```tsx playground
+import { useState } from 'react'
+import { withTimeout, TimeoutError, sleep } from '@cc-heart/utils'
+
+export default function App() {
+  const [result, setResult] = useState('')
+
+  const run = async (taskMs) => {
+    setResult('running...')
+    try {
+      await withTimeout(sleep(taskMs), 1000)
+      setResult(`✅ task (${taskMs}ms) finished within the budget`)
+    } catch (e) {
+      if (e instanceof TimeoutError) setResult(`⏰ TimeoutError: task (${taskMs}ms) exceeded 1000ms`)
+    }
+  }
+
+  return (
+    <div style={{ fontFamily: 'monospace' }}>
+      <button onClick={() => run(500)}>fast task (500ms)</button>{' '}
+      <button onClick={() => run(2000)}>slow task (2000ms)</button>
+      <p>{result}</p>
+    </div>
+  )
+}
+```

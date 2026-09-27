@@ -1,0 +1,76 @@
+# Date
+
+Date formatting helpers.
+
+## formatDate
+
+Format a `Date` with a pattern. Defaults to `YYYY-MM-DD hh:mm:ss`.
+
+```ts
+import { formatDate } from '@cc-heart/utils'
+
+formatDate(new Date()) // '2026-09-27 08:00:00'
+formatDate(new Date(), 'YYYY/MM/DD') // '2026/09/27'
+```
+
+## formatDateByTimeStamp
+
+Same as `formatDate`, but accepts a timestamp (ms).
+
+```ts
+formatDateByTimeStamp(1727244000000, 'YYYY-MM-DD')
+```
+
+## formatDateTimeByString
+
+Same as `formatDate`, but accepts a date string.
+
+```ts
+formatDateTimeByString('2026-09-27 08:00:00', 'MM-DD')
+```
+
+## getCurrentTimeISOString
+
+Current time as an ISO string.
+
+```ts
+getCurrentTimeISOString() // '2026-09-27T08:00:00.000+08:00'
+```
+
+## Demo
+
+Pick a pattern and see the formatted result live:
+
+```tsx playground
+import { useState } from 'react'
+import { formatDate, formatDateByTimeStamp } from '@cc-heart/utils'
+
+const patterns = ['YYYY-MM-DD hh:mm:ss', 'YYYY/MM/DD', 'MM-DD hh:mm', 'YYYY年MM月DD日']
+
+export default function App() {
+  const [pattern, setPattern] = useState(patterns[0])
+  const [now, setNow] = useState(() => Date.now())
+
+  return (
+    <div style={{ fontFamily: 'monospace', lineHeight: 2 }}>
+      {patterns.map((p) => (
+        <label key={p} style={{ display: 'block' }}>
+          <input
+            type="radio"
+            checked={pattern === p}
+            onChange={() => setPattern(p)}
+          />{' '}
+          {p}
+        </label>
+      ))}
+      <div>
+        formatDate: <b>{formatDate(new Date(now), pattern)}</b>
+      </div>
+      <div>
+        formatDateByTimeStamp: <b>{formatDateByTimeStamp(now, pattern)}</b>
+      </div>
+      <button onClick={() => setNow(Date.now())}>refresh now</button>
+    </div>
+  )
+}
+```

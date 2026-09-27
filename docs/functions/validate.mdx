@@ -1,0 +1,69 @@
+# Validate
+
+Type & value validators. All of them are TypeScript type guards.
+
+| Function | Checks |
+| --- | --- |
+| `isStr` / `isBool` / `isNumber` | primitive types |
+| `isObject` / `isFn` / `isSymbol` / `isPromise` | reference types |
+| `isNull` / `isUndef` / `isNil` | null-ish values |
+| `isPrimitive` / `isFalsy` / `isEffectiveNumber` | composite checks |
+
+```ts
+import { isPromise, isNil } from '@cc-heart/utils'
+
+isPromise(Promise.resolve()) // true
+isNil(null) // true
+isNil(0) // false
+```
+
+## Demo
+
+Pick a value and see every validator's verdict:
+
+```tsx playground
+import { useState } from 'react'
+import {
+  isStr, isBool, isNumber, isObject, isFn, isPromise, isNil, isFalsy,
+} from '@cc-heart/utils'
+
+const candidates = {
+  '"hello"': 'hello',
+  '42': 42,
+  'true': true,
+  '{}': {},
+  '() => {}': () => {},
+  'Promise.resolve()': Promise.resolve(),
+  'null': null,
+  '0': 0,
+}
+
+const validators = { isStr, isBool, isNumber, isObject, isFn, isPromise, isNil, isFalsy }
+
+export default function App() {
+  const [key, setKey] = useState('Promise.resolve()')
+  const value = candidates[key]
+
+  return (
+    <div style={{ fontFamily: 'monospace' }}>
+      {Object.keys(candidates).map((k) => (
+        <label key={k} style={{ display: 'inline-block', marginRight: 10 }}>
+          <input type="radio" checked={key === k} onChange={() => setKey(k)} /> {k}
+        </label>
+      ))}
+      <table style={{ marginTop: 8 }}>
+        <tbody>
+          {Object.entries(validators).map(([name, fn]) => (
+            <tr key={name}>
+              <td>{name}</td>
+              <td style={{ color: fn(value) ? '#42b883' : '#e05561' }}>
+                {String(fn(value))}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+```

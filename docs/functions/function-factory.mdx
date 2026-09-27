@@ -1,0 +1,88 @@
+# Function Factory
+
+Higher-order functions that wrap your functions with extra behavior.
+
+## defineDebounceFn
+
+Debounce: only the last call within `delay` runs.
+
+```ts
+import { defineDebounceFn } from '@cc-heart/utils'
+
+const onInput = defineDebounceFn((v) => search(v), 300)
+```
+
+## defineThrottleFn
+
+Throttle: at most one call per `delay` window.
+
+```ts
+import { defineThrottleFn } from '@cc-heart/utils'
+
+const onScroll = defineThrottleFn(() => update(), 200)
+```
+
+## defineOnceFn
+
+The wrapped function can only be executed once.
+
+```ts
+import { defineOnceFn } from '@cc-heart/utils'
+
+const init = defineOnceFn(() => setup())
+init() // runs
+init() // no-op, returns cached result
+```
+
+## defineSinglePromiseFn
+
+Concurrent calls share a single in-flight promise.
+
+```ts
+import { defineSinglePromiseFn } from '@cc-heart/utils'
+
+const loadUser = defineSinglePromiseFn(() => fetchUser())
+await Promise.all([loadUser(), loadUser()]) // one request only
+```
+
+## Demo
+
+Click fast and compare raw vs debounced vs throttled call counts:
+
+```tsx playground
+import { useMemo, useState } from 'react'
+import { defineDebounceFn, defineThrottleFn, defineOnceFn } from '@cc-heart/utils'
+
+export default function App() {
+  const [raw, setRaw] = useState(0)
+  const [debounced, setDebounced] = useState(0)
+  const [throttled, setThrottled] = useState(0)
+  const [once, setOnce] = useState(0)
+
+  const fns = useMemo(
+    () => ({
+      debounce: defineDebounceFn(() => setDebounced((n) => n + 1), 500),
+      throttle: defineThrottleFn(() => setThrottled((n) => n + 1), 500),
+      once: defineOnceFn(() => setOnce((n) => n + 1)),
+    }),
+    []
+  )
+
+  const click = () => {
+    setRaw((n) => n + 1)
+    fns.debounce()
+    fns.throttle()
+    fns.once()
+  }
+
+  return (
+    <div style={{ fontFamily: 'monospace', lineHeight: 2 }}>
+      <button onClick={click}>click me fast!</button>
+      <div>raw clicks: <b>{raw}</b></div>
+      <div>debounce(500ms) fired: <b>{debounced}</b></div>
+      <div>throttle(500ms) fired: <b>{throttled}</b></div>
+      <div>once fired: <b>{once}</b> (always ≤ 1)</div>
+    </div>
+  )
+}
+```

@@ -1,0 +1,82 @@
+# URL
+
+Query string and path helpers.
+
+## queryStringToObject
+
+Parse a query string into an object.
+
+```ts
+import { queryStringToObject } from '@cc-heart/utils'
+
+queryStringToObject('a=1&b=hello') // { a: '1', b: 'hello' }
+queryStringToObject('foo[0]=1&foo[1]=2') // { foo: ['1', '2'] }
+```
+
+:::tip
+The input should be a bare query string. When reading from `location.search`, strip the leading `?` first: `queryStringToObject(location.search.slice(1))`.
+:::
+
+## objectToQueryString
+
+Serialize an object into a query string.
+
+```ts
+objectToQueryString({ a: 1, b: 'hello' }) // 'a=1&b=hello'
+```
+
+## basename
+
+Extract the last portion of a path, optionally stripping a suffix.
+
+```ts
+basename('/foo/bar/baz.txt') // 'baz.txt'
+basename('/foo/bar/baz.txt', '.txt') // 'baz'
+```
+
+## convertParamsRouterToRegExp
+
+Convert a route pattern with `:params` into a `RegExp`.
+
+```ts
+convertParamsRouterToRegExp('/user/:id') // /^\/user\/([^/]+)$/
+```
+
+## Demo
+
+Edit the query string / path and watch the conversions:
+
+```tsx playground
+import { useState } from 'react'
+import { queryStringToObject, objectToQueryString, basename } from '@cc-heart/utils'
+
+export default function App() {
+  const [qs, setQs] = useState('page=1&size=20&sort=desc')
+  const [path, setPath] = useState('/api/users/list.ts')
+
+  let parsed = {}
+  let roundTrip = ''
+  try {
+    parsed = queryStringToObject(qs)
+    roundTrip = objectToQueryString(parsed)
+  } catch {
+    /* typing in progress */
+  }
+
+  return (
+    <div style={{ fontFamily: 'monospace', lineHeight: 2 }}>
+      <div>
+        query: <input value={qs} onChange={(e) => setQs(e.target.value)} style={{ width: 260 }} />
+      </div>
+      <div>→ object: <b>{JSON.stringify(parsed)}</b></div>
+      <div>→ back to string: <b>{roundTrip}</b></div>
+      <hr />
+      <div>
+        path: <input value={path} onChange={(e) => setPath(e.target.value)} style={{ width: 260 }} />
+      </div>
+      <div>→ basename: <b>{basename(path)}</b></div>
+      <div>→ basename(path, '.ts'): <b>{basename(path, '.ts')}</b></div>
+    </div>
+  )
+}
+```

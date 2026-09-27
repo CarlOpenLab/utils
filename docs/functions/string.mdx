@@ -1,0 +1,70 @@
+# String
+
+String helpers.
+
+## capitalize
+
+Capitalize the first letter of a string.
+
+```ts
+import { capitalize } from '@cc-heart/utils'
+
+capitalize('string') // 'String'
+```
+
+## unCapitalize
+
+Lowercase the first letter of a string.
+
+```ts
+unCapitalize('String') // 'string'
+```
+
+## underlineToHump
+
+Convert `snake_case` to `camelCase`.
+
+```ts
+underlineToHump('hello_world') // 'helloWorld'
+```
+
+## mulSplit
+
+Split a string repeatedly by multiple separators.
+
+```ts
+mulSplit('a,b;c', ',;') // ['a', 'b', 'c']
+```
+
+## Demo
+
+Type below and watch each helper react:
+
+```tsx playground
+import { useState } from 'react'
+import { capitalize, unCapitalize, underlineToHump, mulSplit } from '@cc-heart/utils'
+
+export default function App() {
+  const [text, setText] = useState('hello_world,foo_bar')
+
+  const row = (name, value) => (
+    <div>
+      <code>{name}</code> → <b>{value}</b>
+    </div>
+  )
+
+  return (
+    <div style={{ fontFamily: 'monospace', lineHeight: 2 }}>
+      <input
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        style={{ width: 280 }}
+      />
+      {row('capitalize', capitalize(text))}
+      {row('unCapitalize', unCapitalize(text))}
+      {row('underlineToHump', underlineToHump(text))}
+      {row('mulSplit(,_)', JSON.stringify(mulSplit(text, ',_')))}
+    </div>
+  )
+}
+```
