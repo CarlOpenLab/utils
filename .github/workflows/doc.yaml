@@ -38,6 +38,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
+      # playground demos import the package by name, which resolves to this
+      # repo's own exports — dist must exist first
+      - name: Build library
+        run: pnpm build
+
       - name: Build utils Docs
         run: pnpm docs:build
 
