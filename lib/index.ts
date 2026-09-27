@@ -1,3 +1,4 @@
+export * from './async'
 export * from './date'
 export * from './define'
 export * from './random'
