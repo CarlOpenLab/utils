@@ -21,7 +21,8 @@ jobs:
       - name: Set node
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          # rslint loads its TS config via native TypeScript support (>= 22.6)
+          node-version: 23.x
           cache: pnpm
 
       - name: Install Deps
